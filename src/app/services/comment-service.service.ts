@@ -8,7 +8,7 @@ import { AuthServiceService } from './auth-service.service';
   providedIn: 'root'
 })
 export class CommentServiceService {
-  private apiUrl = 'http://localhost:5266/api/Comment/';
+  private apiUrl = 'https://ustagramapi-2.onrender.com/api/Comment';
 
   constructor(private http: HttpClient, private authService: AuthServiceService) { }
 

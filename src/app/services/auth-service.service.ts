@@ -9,7 +9,7 @@ import { Route, Router } from '@angular/router';
   providedIn: 'root'
 })
 export class AuthServiceService {
-  private apiUrl = 'http://localhost:5266/api/Auth';
+  private apiUrl = 'https://ustagramapi-2.onrender.com/api/Auth';
 
   constructor(private http: HttpClient, private router: Router) {}
 
