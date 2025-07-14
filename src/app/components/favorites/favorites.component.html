@@ -1,0 +1,72 @@
+<div class="favorites-container">
+  <header class="favorites-header">
+    <button class="back-button" routerLink="/feed">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <h1>Saqlangan Postlar</h1>
+  </header>
+
+  <main class="favorites-content">
+    <div *ngIf="isLoading" class="loading-spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+    </div>
+
+    <div *ngIf="!isLoading && favorites.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <i class="far fa-bookmark"></i>
+      </div>
+      <h2>Saqlangan postlar yo'q</h2>
+      <p>Siz hali hech qanday postni saqlamagansiz. Postlarni saqlash uchun ♡ belgisini bosing.</p>
+      <button class="explore-button" routerLink="/explore">Postlarni Ko'rish</button>
+    </div>
+
+    <div class="favorites-grid" *ngIf="!isLoading && favorites.length > 0">
+      <div *ngFor="let favorite of favorites" class="favorite-item">
+        <div class="favorite-header">
+          <div class="user-info" (click)="viewUserProfile(favorite.post.user)">
+            <img [src]="favorite.post.user.photoPath" class="user-avatar">
+            <span class="username">{{ favorite.post.user.username || 'foydalanuvchi' }}</span>
+          </div>
+          <button class="remove-button" (click)="removeFavorite(favorite.id)">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <div class="post-content" (click)="viewPost(favorite.post.id)">
+          <img [src]="favorite.randomPhoto" class="post-image">
+          <div class="post-overlay">
+            <div class="post-stats">
+              <span><i class="fas fa-heart"></i> {{ favorite.post.likes || 0 }}</span>
+              <span><i class="fas fa-comment"></i> {{ favorite.post.comments.length || 0 }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="post-footer">
+          <div class="post-caption">
+            <strong>{{ favorite.post.user.username || 'foydalanuvchi' }}</strong> 
+            {{ favorite.post.description }}
+          </div>
+          <div class="post-date">
+            {{ favorite.post.date | date:'dd.MM.yyyy' }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="favorite-modal" *ngIf="selectedFavorite">
+      <div class="modal-content">
+        <button class="close-button" (click)="closeModal()">×</button>
+        <img [src]="selectedFavorite.photoUrl" alt="Post image">
+        <div class="post-details">
+          <h3>{{ selectedFavorite.text }}</h3>
+          <p>{{ selectedFavorite.description }}</p>
+          <div class="post-meta">
+            <span>Likes: {{ selectedFavorite.likes }}</span>
+            <span>Price: {{ selectedFavorite.price }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
