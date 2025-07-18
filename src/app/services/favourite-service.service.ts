@@ -7,7 +7,7 @@ import { Favourite } from '../interfaces/favourite';
   providedIn: 'root'
 })
 export class FavoritesService {
-  private apiUrl = 'https://ustagramapis.onrender.com/api/Favourites';
+  private apiUrl = 'https://ustagramapi-3.onrender.com/api/Favourites';
 
   constructor(
     private http: HttpClient,
