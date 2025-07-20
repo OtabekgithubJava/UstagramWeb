@@ -72,6 +72,9 @@
             <button (click)="openPostModal(post)" title="Comment">
               <i class="far fa-comment"></i>
             </button>
+            <button (click)="toggleFavorite(post)" title="Save">
+              <i [class]="post.isFavourited ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
+            </button>
           </div>
 
           <div class="post-likes">

@@ -6,7 +6,7 @@ import { FavoritesService } from '../../services/favourite-service.service';
 import { Post } from '../../interfaces/post';
 import { User } from '../../interfaces/user';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { lastValueFrom, Subject, takeUntil } from 'rxjs';
 import { Comment } from '../../interfaces/comment';
 
 @Component({
@@ -147,52 +147,96 @@ export class FeedComponent implements OnInit, OnDestroy {
     });
   }
 
-  loadUserPosts(userId: string): void {
-    this.postService.getPostsByUserId(userId).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (posts) => {
-        this.posts = posts.map(post => ({ 
-          ...post, 
-          isLiked: false, 
-          isFavourited: false,
-          randomPhoto: this.getRandomPhoto()
-        }));
-        this.isLoading = false;
+  toggleFavorite(post: Post & { isFavourited?: boolean; isFavouriteLoading?: boolean }): void {
+    if (!this.currentUser || post.isFavouriteLoading) return;
+
+    post.isFavouriteLoading = true;
+    const wasFavorited = post.isFavourited;
+
+    post.isFavourited = !wasFavorited;
+
+    const action$ = wasFavorited 
+      ? this.favouriteService.deleteFavorite(post.id)
+      : this.favouriteService.createFavorite(post.id);
+
+    action$.pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        post.isFavouriteLoading = false;
       },
       error: (err) => {
-        console.error('Error loading user posts:', err);
-        this.errorMessage = 'Could not load user posts';
-        this.isLoading = false;
+        console.error('Error toggling favorite:', err);
+        post.isFavourited = wasFavorited;
+        post.isFavouriteLoading = false;
       }
     });
   }
 
-  loadPosts(): void {
+  private async checkFavoriteStatus(posts: Post[]): Promise<(Post & { isFavourited?: boolean })[]> {
+    if (!this.currentUser) {
+      return posts.map(post => ({ ...post, isFavourited: false }));
+    }
+
+    const postsWithStatus = [];
+    for (const post of posts) {
+      try {
+        const isFavorited = await lastValueFrom(
+          this.favouriteService.isPostFavorited(post.id).pipe(
+            takeUntil(this.destroy$)
+          )
+        );
+        postsWithStatus.push({ ...post, isFavourited: !!isFavorited });
+      } catch (error) {
+        console.error('Error checking favorite status:', error);
+        postsWithStatus.push({ ...post, isFavourited: false });
+      }
+    }
+    return postsWithStatus;
+  }
+
+  async loadPosts(): Promise<void> {
     if (this.isFetching || !this.hasMorePosts) return;
 
     this.isFetching = true;
-    this.postService.getAllPosts().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (posts) => {
-        if (posts.length === 0) {
-          this.hasMorePosts = false;
-        } else {
-          this.posts = [...this.posts, ...posts.map(post => ({ 
-            ...post, 
-            isLiked: false, 
-            isFavourited: false,
-            randomPhoto: this.getRandomPhoto()
-          }))];
-          this.currentPage++;
-        }
-        this.isLoading = false;
-        this.isFetching = false;
-      },
-      error: (err) => {
-        console.error('Error loading posts:', err);
-        this.errorMessage = 'Could not load posts';
-        this.isLoading = false;
-        this.isFetching = false;
+    try {
+      const posts = await this.postService.getAllPosts().pipe(takeUntil(this.destroy$)).toPromise();
+      if (posts && posts.length === 0) {
+        this.hasMorePosts = false;
+      } else if (posts) {
+        const postsWithStatus = await this.checkFavoriteStatus(posts);
+        this.posts = [...this.posts, ...postsWithStatus.map(post => ({ 
+          ...post, 
+          isLiked: false,
+          randomPhoto: this.getRandomPhoto()
+        }))];
+        this.currentPage++;
       }
-    });
+    } catch (err) {
+      console.error('Error loading posts:', err);
+      this.errorMessage = 'Could not load posts';
+    } finally {
+      this.isLoading = false;
+      this.isFetching = false;
+    }
+  }
+
+  async loadUserPosts(userId: string): Promise<void> {
+    this.isLoading = true;
+    try {
+      const posts = await this.postService.getPostsByUserId(userId).pipe(takeUntil(this.destroy$)).toPromise();
+      if (posts) {
+        const postsWithStatus = await this.checkFavoriteStatus(posts);
+        this.posts = postsWithStatus.map(post => ({ 
+          ...post, 
+          isLiked: false,
+          randomPhoto: this.getRandomPhoto()
+        }));
+      }
+    } catch (err) {
+      console.error('Error loading user posts:', err);
+      this.errorMessage = 'Could not load user posts';
+    } finally {
+      this.isLoading = false;
+    }
   }
 
   setupScrollListener(): void {
