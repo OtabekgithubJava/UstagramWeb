@@ -8,7 +8,7 @@ import { AuthServiceService } from './auth-service.service';
   providedIn: 'root'
 })
 export class UserServiceService {
-  private apiUrl = 'https://ustagramapis.onrender.com/api/User';
+  private apiUrl = 'https://ustagramapi-2.onrender.com/api/User';
 
   constructor(private http: HttpClient, private authService: AuthServiceService) { }
 
