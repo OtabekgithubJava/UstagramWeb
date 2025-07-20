@@ -15,7 +15,7 @@ import { Comment } from '../../interfaces/comment';
   styleUrls: ['./feed.component.scss']
 })
 export class FeedComponent implements OnInit, OnDestroy {
-  posts: (Post & { isLiked?: boolean; isFavourited?: boolean; randomPhoto?: string })[] = [];
+  posts: (Post & { isLiked?: boolean; isFavourited?: boolean; randomPhoto?: string; isFavouriteLoading?: boolean })[] = [];
   currentUser: User | null = null;
   viewedUser: User | null = null;
   isLoading = true;
@@ -27,29 +27,17 @@ export class FeedComponent implements OnInit, OnDestroy {
   selectedStory: string | null = null;
   storyModalVisible = false;
 
-  
   private destroy$ = new Subject<void>();
   private currentPage = 1;
   private postsPerPage = 5;
   private isFetching = false;
   private hasMorePosts = true;
+  private userFavorites: string[] = [];
   
   private photoList: string[] = [
-    'p1.jpeg',
-    'p2.jpeg',
-    'p3.jpeg',
-    'p4.jpeg',
-    'p5.jpeg',
-    'p6.jpeg',
-    'p7.jpeg',
-    'p8.jpeg',
-    'p9.jpeg',
-    'p10.jpeg',
-    'p11.jpeg',
-    'p12.jpeg',
-    'p13.jpeg',
-    'p14.jpeg',
-    'p15.jpeg',
+    'p1.jpeg', 'p2.jpeg', 'p3.jpeg', 'p4.jpeg', 'p5.jpeg',
+    'p6.jpeg', 'p7.jpeg', 'p8.jpeg', 'p9.jpeg', 'p10.jpeg',
+    'p11.jpeg', 'p12.jpeg', 'p13.jpeg', 'p14.jpeg', 'p15.jpeg'
   ];
 
   constructor(
@@ -86,7 +74,32 @@ export class FeedComponent implements OnInit, OnDestroy {
     this.isMobileView = window.innerWidth < 768;
   }
 
-  loadInitialData(): void {
+  private async loadUserFavorites(): Promise<void> {
+    if (!this.currentUser) return;
+
+    try {
+      const favorites = await lastValueFrom(
+        this.favouriteService.getFavoritesByUser().pipe(takeUntil(this.destroy$))
+      );
+      this.userFavorites = favorites.map(fav => fav.postId);
+    } catch (err) {
+      console.error('Error loading favorites:', err);
+      this.userFavorites = [];
+    }
+  }
+
+  private isPostFavorited(postId: string): boolean {
+    return this.userFavorites.includes(postId);
+  }
+
+  private async checkFavoriteStatus(posts: Post[]): Promise<(Post & { isFavourited?: boolean })[]> {
+    return posts.map(post => ({
+      ...post,
+      isFavourited: this.isPostFavorited(post.id)
+    }));
+  }
+
+  async loadInitialData(): Promise<void> {
     const userId = this.authService.getCurrentUserId();
     if (!userId) {
       this.router.navigate(['/login']);
@@ -96,19 +109,22 @@ export class FeedComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.userService.getUserById(userId).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (user) => this.currentUser = user,
-      error: (err) => console.error('Error loading user:', err)
-    });
+    try {
+      const user = await lastValueFrom(
+        this.userService.getUserById(userId).pipe(takeUntil(this.destroy$))
+      );
+      this.currentUser = user;
+      await this.loadUserFavorites();
 
-    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
-      const username = params.get('username');
+      const username = this.route.snapshot.paramMap.get('username');
       if (username) {
-        this.loadUserProfile(username);
+        await this.loadUserProfile(username);
       } else {
-        this.loadPosts();
+        await this.loadPosts();
       }
-    });
+    } catch (err) {
+      console.error('Error loading initial data:', err);
+    }
   }
 
   openStoryModal(photo: string): void {
@@ -124,27 +140,27 @@ export class FeedComponent implements OnInit, OnDestroy {
   }
 
   @HostListener('document:keydown.escape', ['$event'])
-    onKeydownHandler(event: KeyboardEvent) {
-      if (this.storyModalVisible) {
-        this.closeStoryModal();
-      }
+  onKeydownHandler(event: KeyboardEvent) {
+    if (this.storyModalVisible) {
+      this.closeStoryModal();
     }
+  }
 
-  loadUserProfile(username: string): void {
+  async loadUserProfile(username: string): Promise<void> {
     this.showUserProfile = true;
     this.isLoading = true;
 
-    this.userService.getUserByUsername(username).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (user) => {
-        this.viewedUser = user;
-        this.loadUserPosts(user.id);
-      },
-      error: (err) => {
-        console.error('Error loading user profile:', err);
-        this.errorMessage = 'Could not load user profile';
-        this.isLoading = false;
-      }
-    });
+    try {
+      const user = await lastValueFrom(
+        this.userService.getUserByUsername(username).pipe(takeUntil(this.destroy$))
+      );
+      this.viewedUser = user;
+      await this.loadUserPosts(user.id);
+    } catch (err) {
+      console.error('Error loading user profile:', err);
+      this.errorMessage = 'Could not load user profile';
+      this.isLoading = false;
+    }
   }
 
   toggleFavorite(post: Post & { isFavourited?: boolean; isFavouriteLoading?: boolean }): void {
@@ -154,6 +170,11 @@ export class FeedComponent implements OnInit, OnDestroy {
     const wasFavorited = post.isFavourited;
 
     post.isFavourited = !wasFavorited;
+    if (post.isFavourited) {
+      this.userFavorites.push(post.id);
+    } else {
+      this.userFavorites = this.userFavorites.filter(id => id !== post.id);
+    }
 
     const action$ = wasFavorited 
       ? this.favouriteService.deleteFavorite(post.id)
@@ -166,31 +187,14 @@ export class FeedComponent implements OnInit, OnDestroy {
       error: (err) => {
         console.error('Error toggling favorite:', err);
         post.isFavourited = wasFavorited;
+        if (wasFavorited) {
+          this.userFavorites.push(post.id);
+        } else {
+          this.userFavorites = this.userFavorites.filter(id => id !== post.id);
+        }
         post.isFavouriteLoading = false;
       }
     });
-  }
-
-  private async checkFavoriteStatus(posts: Post[]): Promise<(Post & { isFavourited?: boolean })[]> {
-    if (!this.currentUser) {
-      return posts.map(post => ({ ...post, isFavourited: false }));
-    }
-
-    const postsWithStatus = [];
-    for (const post of posts) {
-      try {
-        const isFavorited = await lastValueFrom(
-          this.favouriteService.isPostFavorited(post.id).pipe(
-            takeUntil(this.destroy$)
-          )
-        );
-        postsWithStatus.push({ ...post, isFavourited: !!isFavorited });
-      } catch (error) {
-        console.error('Error checking favorite status:', error);
-        postsWithStatus.push({ ...post, isFavourited: false });
-      }
-    }
-    return postsWithStatus;
   }
 
   async loadPosts(): Promise<void> {
@@ -198,7 +202,10 @@ export class FeedComponent implements OnInit, OnDestroy {
 
     this.isFetching = true;
     try {
-      const posts = await this.postService.getAllPosts().pipe(takeUntil(this.destroy$)).toPromise();
+      const posts = await lastValueFrom(
+        this.postService.getAllPosts().pipe(takeUntil(this.destroy$))
+      );
+      
       if (posts && posts.length === 0) {
         this.hasMorePosts = false;
       } else if (posts) {
@@ -206,7 +213,8 @@ export class FeedComponent implements OnInit, OnDestroy {
         this.posts = [...this.posts, ...postsWithStatus.map(post => ({ 
           ...post, 
           isLiked: false,
-          randomPhoto: this.getRandomPhoto()
+          randomPhoto: this.getRandomPhoto(),
+          isFavouriteLoading: false
         }))];
         this.currentPage++;
       }
@@ -222,13 +230,17 @@ export class FeedComponent implements OnInit, OnDestroy {
   async loadUserPosts(userId: string): Promise<void> {
     this.isLoading = true;
     try {
-      const posts = await this.postService.getPostsByUserId(userId).pipe(takeUntil(this.destroy$)).toPromise();
+      const posts = await lastValueFrom(
+        this.postService.getPostsByUserId(userId).pipe(takeUntil(this.destroy$))
+      );
+      
       if (posts) {
         const postsWithStatus = await this.checkFavoriteStatus(posts);
         this.posts = postsWithStatus.map(post => ({ 
           ...post, 
           isLiked: false,
-          randomPhoto: this.getRandomPhoto()
+          randomPhoto: this.getRandomPhoto(),
+          isFavouriteLoading: false
         }));
       }
     } catch (err) {
