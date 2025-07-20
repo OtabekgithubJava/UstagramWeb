@@ -43,7 +43,7 @@
     </div>
 
     <div *ngFor="let user of searchResults" class="user-result" (click)="navigateToProfile(user.username)">
-      <img [src]="user.photoPath || 'assets/default-profile.png'" class="user-avatar">
+      <img [src]="user.photoUrl" class="photo.png">
       <div class="user-info">
         <span class="username">{{ user.username }}</span>
         <span class="full-name">{{ user.fullName }}</span>
@@ -65,7 +65,7 @@
       <div class="table-body">
         <div *ngFor="let user of filteredTopUsers" class="table-row" (click)="navigateToProfile(user.username)">
           <div class="table-cell user-cell">
-            <img [src]="user.photoPath || 'assets/default-profile.png'" class="user-avatar">
+            <img [src]="user.photoUrl" class="user-avatar">
             <div class="user-info">
               <span class="username">{{ user.username }}</span>
               <span class="full-name">{{ user.fullName }}</span>

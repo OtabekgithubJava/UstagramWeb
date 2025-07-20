@@ -9,7 +9,7 @@
 
       <div class="post-details-section" *ngIf="!isMobile">
         <div class="post-header">
-          <img [src]="post.user.photoPath" class="user-pic">
+          <img [src]="post.user.photoPath || 'photo.png'" class="user-pic">
           <span class="username">{{ post.user.username || 'unknown' }}</span>
         </div>
 
@@ -20,7 +20,7 @@
 
         <div class="post-comments">
           <div class="comment" *ngFor="let comment of post.comments || []">
-            <img [src]="comment.user?.photoPath || 'default-profile.png'" class="comment-user-pic">
+            <img [src]="comment.user?.photoPath || 'photo.png'" class="comment-user-pic">
             <div class="comment-content">
               <strong>{{ comment.user?.username || 'unknown' }}</strong> {{ comment.content }}
             </div>
@@ -59,7 +59,7 @@
         </div>
         <div class="post-comments">
           <div class="comment" *ngFor="let comment of post.comments || []">
-            <img [src]="comment.user?.photoPath || 'default-profile.png'" class="comment-user-pic">
+            <img [src]="comment.user?.photoPath || 'photo.png'"  class="comment-user-pic">
             <div class="comment-content">
               <strong>{{ comment.user?.username || 'unknown' }}</strong> {{ comment.content }}
             </div>

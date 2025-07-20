@@ -20,7 +20,7 @@
       </div>
       <div class="profile-info">
         <div class="profile-pic-container">
-          <img [src]="viewedUser.photoPath || 'assets/default-profile.jpg'" class="profile-pic">
+          <img [src]="viewedUser.photoPath || 'photo.png'" class="profile-pic">
         </div>
         <div class="profile-stats">
           <div class="stat"><strong>{{ posts.length }}</strong><span>Posts</span></div>
@@ -56,7 +56,7 @@
         <div *ngFor="let post of posts" class="post-card">
           <div class="post-header">
             <div class="post-user" (click)="navigateToUserProfile(post.user.username || '')">
-              <img [src]="post.user.photoPath || 'assets/default-profile.jpg'" class="post-avatar">
+              <img [src]="post.user.photoPath || 'photo.png'" class="post-avatar">
               <span class="post-username">{{ post.user.username || 'unknown' }}</span>
             </div>
             <button class="post-more">⋮</button>
