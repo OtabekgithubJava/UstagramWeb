@@ -24,6 +24,9 @@ export class FeedComponent implements OnInit, OnDestroy {
   isMobileView = false;
   showUserProfile = false;
   storyPhotos: string[] = [];
+  selectedStory: string | null = null;
+  storyModalVisible = false;
+
   
   private destroy$ = new Subject<void>();
   private currentPage = 1;
@@ -107,6 +110,25 @@ export class FeedComponent implements OnInit, OnDestroy {
       }
     });
   }
+
+  openStoryModal(photo: string): void {
+    this.selectedStory = photo;
+    this.storyModalVisible = true;
+    document.body.style.overflow = 'hidden'; 
+  }
+
+  closeStoryModal(): void {
+    this.selectedStory = null;
+    this.storyModalVisible = false;
+    document.body.style.overflow = ''; 
+  }
+
+  @HostListener('document:keydown.escape', ['$event'])
+    onKeydownHandler(event: KeyboardEvent) {
+      if (this.storyModalVisible) {
+        this.closeStoryModal();
+      }
+    }
 
   loadUserProfile(username: string): void {
     this.showUserProfile = true;

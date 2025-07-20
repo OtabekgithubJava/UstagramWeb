@@ -14,7 +14,7 @@ export class AuthServiceService {
   constructor(private http: HttpClient, private router: Router) {}
 
   private handleError(error: any) {
-    console.error('Auth error:', error);
+    // console.error('Auth error:', error);
     let errorMsg = error.error?.error || error.message || 'An unexpected error occurred';
     if (error.error?.details) {
       errorMsg = error.error.details.join('; ');
@@ -26,10 +26,10 @@ export class AuthServiceService {
   }
 
   signup(formData: FormData): Observable<any> {
-    console.log('FormData contents:');
-    for (let pair of (formData as any).entries()) {
-        console.log(pair[0] + ', ' + pair[1]);
-    }
+    // console.log('FormData contents:');
+    // for (let pair of (formData as any).entries()) {
+    //     console.log(pair[0] + ', ' + pair[1]);
+    // }
     return this.http.post(`${this.apiUrl}/signup`, formData, {
       headers: new HttpHeaders({
             'enctype': 'multipart/form-data'

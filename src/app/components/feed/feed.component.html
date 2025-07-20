@@ -43,11 +43,10 @@
     <div class="feed-view" *ngIf="!showUserProfile">
       <div class="stories-container">
         <div class="stories">
-          <div *ngFor="let photo of storyPhotos; let i = index" class="story">
+          <div *ngFor="let photo of storyPhotos; let i = index" class="story" (click)="openStoryModal(photo)">
             <div class="story-avatar">
-              <img [src]="photo" loading="lazy" alt="User">
+              <img [src]="photo" loading="lazy" alt="Story">
             </div>
-            <span class="story-username">user{{i+1}}</span>
           </div>
         </div>
       </div>
@@ -118,4 +117,11 @@
     [user]="currentUser"
     (close)="closeModal()">
   </app-post-modal>
+
+  <div class="story-modal-backdrop" *ngIf="selectedStory" (click)="closeStoryModal()">
+    <div class="story-modal-content" (click)="$event.stopPropagation()">
+      <img [src]="selectedStory" alt="Story" class="story-modal-image">
+      <button class="story-close-button" (click)="closeStoryModal()">×</button>
+    </div>
+  </div>
 </div>
