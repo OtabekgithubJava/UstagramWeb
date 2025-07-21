@@ -14,9 +14,10 @@
   <div class="profile-content">
     <div class="profile-info-section">
       <div class="profile-pic-container">
-        <img [src]="user.photoUrl" 
+        <!-- <img [src]="user.photoUrl" 
              (error)="user.photoPath = 'photo.png'"
-             class="profile-pic">
+             class="profile-pic"> -->
+        <img src="photo.png" class="profile-pic">
         <div class="profile-badge" *ngIf="user.masterType">
           {{ user.masterType }}
         </div>

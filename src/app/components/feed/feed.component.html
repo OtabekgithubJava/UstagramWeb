@@ -20,7 +20,8 @@
       </div>
       <div class="profile-info">
         <div class="profile-pic-container">
-          <img [src]="viewedUser.photoPath || 'photo.png'" class="profile-pic">
+          <!-- <img [src]="viewedUser.photoPath || 'photo.png'" class="profile-pic"> -->
+          <img src="photo.png" class="profile-pic">
         </div>
         <div class="profile-stats">
           <div class="stat"><strong>{{ posts.length }}</strong><span>Posts</span></div>
@@ -71,7 +72,7 @@
             </div>
             <div class="story-user-info">
               <img [src]="stories[activeStoryIndex].user.photoPath || 'photo.png'" class="viewer-avatar">
-              <span class="viewer-username">{{ stories[activeStoryIndex].user.username }}</span>
+              <span class="viewer-username">Ustagram</span>
               <span class="story-time">{{ stories[activeStoryIndex].time }}</span>
             </div>
             <button class="close-story" (click)="closeStoryViewer()">
@@ -83,12 +84,12 @@
             <img [src]="stories[activeStoryIndex].image" class="story-image" (click)="nextStory()">
           </div>
           
-          <div class="story-footer">
+          <!-- <div class="story-footer">
             <input type="text" class="story-reply" placeholder="Send message">
             <button class="send-reply">
               <i class="far fa-paper-plane"></i>
             </button>
-          </div>
+          </div> -->
           
           <div class="story-nav prev-story" (click)="prevStory($event)">
             <i class="fas fa-chevron-left"></i>
@@ -103,7 +104,8 @@
         <div *ngFor="let post of posts" class="post-card">
           <div class="post-header">
             <div class="post-user" (click)="navigateToUserProfile(post.user.username || '')">
-              <img [src]="post.user.photoPath || 'photo.png'" class="post-avatar">
+              <!-- <img [src]="post.user.photoPath || 'photo.png'" class="post-avatar"> -->
+              <img src="photo.png" class="post-avatar">
               <span class="post-username">{{ post.user.username || 'unknown' }}</span>
             </div>
             <button class="post-more">⋮</button>
