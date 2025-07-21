@@ -44,7 +44,7 @@
 
     <div *ngFor="let user of searchResults" class="user-result" (click)="navigateToProfile(user.username)">
       <!-- <img [src]="user.photoUrl" class="photo.png"> -->
-      <img src="photo.png" class="photo.png">
+      <img src="photo.png" class="user-avatar">
       <div class="user-info">
         <span class="username">{{ user.username }}</span>
         <span class="full-name">{{ user.fullName }}</span>

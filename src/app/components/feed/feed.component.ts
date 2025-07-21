@@ -80,9 +80,9 @@ export class FeedComponent implements OnInit, OnDestroy {
   generateStories(): void {
     this.stories = Array(10).fill(null).map((_, i) => ({
       user: {
-        username: `user${i+1}`,
+        username: ``,
         photoPath: this.getRandomPhoto(),
-        fullName: `User ${i+1}`
+        fullName: ``
       },
       image: this.getRandomPhoto(),
       time: this.getRandomTime(),
