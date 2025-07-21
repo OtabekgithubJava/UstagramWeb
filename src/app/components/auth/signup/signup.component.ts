@@ -17,7 +17,7 @@ export class SignupComponent implements OnInit {
   isLoading = false;
   
   regions = [
-    'Andijon', 'Buxoro', 'Farg\'ona', 'Jizzax', 
+    'Andijon', 'Buxoro', 'Farg`ona', 'Jizzax', 
     'Xorazm', 'Namangan', 'Navoiy', 'Qashqadaryo',
     'Samarqand', 'Sirdaryo', 'Surxondaryo', 'Toshkent'
   ];

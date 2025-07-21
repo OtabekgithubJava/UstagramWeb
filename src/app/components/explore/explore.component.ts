@@ -4,6 +4,7 @@ import { User } from '../../interfaces/user';
 import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { PostServiceService } from '../../services/post-service.service';
 
 @Component({
   selector: 'app-explore',
@@ -22,6 +23,7 @@ export class ExploreComponent implements OnInit {
 
   constructor(
     private userService: UserServiceService,
+    private postService: PostServiceService,
     private router: Router
   ) {}
 
@@ -38,23 +40,51 @@ export class ExploreComponent implements OnInit {
         return this.userService.searchUsers(term);
       })
     ).subscribe(users => {
-      this.searchResults = users;
+      this.searchResults = this.removeDuplicateUsers(users);
       this.isLoading = false;
     });
   }
 
-  loadTopUsers(): void {
-    this.isLoading = true;
-    this.userService.getAllUsers().subscribe({
-      next: (users) => {
-        this.topUsers = users;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('Error loading top users:', err);
-        this.isLoading = false;
+  private removeDuplicateUsers(users: User[]): User[] {
+    const uniqueUsers = new Map<string, User>();
+    users.forEach(user => {
+      if (user.username && !uniqueUsers.has(user.username)) {
+        uniqueUsers.set(user.username, user);
       }
     });
+    return Array.from(uniqueUsers.values());
+  }
+
+  async loadTopUsers(): Promise<void> {
+    this.isLoading = true;
+    try {
+      const users = await this.userService.getAllUsers().toPromise();
+      const uniqueUsers = this.removeDuplicateUsers(users || []);
+      
+      const allPosts = await this.postService.getAllPosts().toPromise();
+      
+      const usersWithStats = uniqueUsers.map(user => {
+        const userPosts = allPosts?.filter(post => post.user?.id === user.id) || [];
+        const postCount = userPosts.length;
+        const commentCount = userPosts.reduce((total, post) => {
+          return total + (post.comments?.length || 0);
+        }, 0);
+        
+        return {
+          ...user,
+          postCount,
+          commentCount,
+          engagementScore: postCount + (commentCount * 0.5) 
+        };
+      });
+
+      this.topUsers = usersWithStats.sort((a, b) => b.engagementScore - a.engagementScore);
+      
+    } catch (err) {
+      console.error('Error loading top users:', err);
+    } finally {
+      this.isLoading = false;
+    }
   }
 
   search(term: string): void {
@@ -68,7 +98,7 @@ export class ExploreComponent implements OnInit {
     this.showTopUsers = false;
     this.userService.searchUsers(term).subscribe({
       next: (users) => {
-        this.searchResults = users;
+        this.searchResults = this.removeDuplicateUsers(users);
         this.isLoading = false;
       },
       error: (err) => {

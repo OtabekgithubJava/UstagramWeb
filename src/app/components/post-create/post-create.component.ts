@@ -29,9 +29,9 @@ export class PostCreateComponent implements OnInit {
   errorMessage = '';
   
   categories = [
-    { value: 'Ish', label: 'Job Opportunity' },
-    { value: 'Sotuv', label: 'For Sale' },
-    { value: 'Reklama', label: 'Advertisement' }
+    { value: 'Ish', label: 'Qilingan ish' },
+    { value: 'Sotuv', label: 'Sotiladi' },
+    { value: 'Reklama', label: 'Reklama' }
   ];
 
   constructor(
@@ -130,21 +130,21 @@ export class PostCreateComponent implements OnInit {
     if (this.editingPostId) {
       this.postService.updatePost(this.editingPostId, formData).subscribe({
         next: () => {
-          this.showSuccess('Post updated successfully!');
+          this.showSuccess('Post muvaffaqqiyatli tahrirlandi!');
           setTimeout(() => this.router.navigate(['/feed']), 1500);
         },
         error: (err) => {
-          this.handleError(err, 'Failed to update post');
+          this.handleError(err, 'Xatolik');
         }
       });
     } else {
       this.postService.createPost(formData).subscribe({
         next: () => {
-          this.showSuccess('Post created successfully!');
+          this.showSuccess('Post muvaffaqqiyatli yaratildi!');
           setTimeout(() => this.router.navigate(['/feed']), 1500);
         },
         error: (err) => {
-          this.handleError(err, 'Failed to create post');
+          this.handleError(err, 'Xatolik');
         }
       });
     }

@@ -43,7 +43,7 @@ export class EditProfileComponent implements OnInit {
   notification: { message: string; type: 'success' | 'error' } | null = null;
   isSubmitting = false;
   regions = [
-    'Andijon', 'Buxoro', 'Farg\'ona', 'Jizzax', 
+    'Andijon', 'Buxoro', 'Farg`ona', 'Jizzax', 
     'Xorazm', 'Namangan', 'Navoiy', 'Qashqadaryo',
     'Samarqand', 'Sirdaryo', 'Surxondaryo', 'Toshkent'
   ];
@@ -51,7 +51,8 @@ export class EditProfileComponent implements OnInit {
     { value: 'Eshik-deraza', label: 'Eshik-deraza' },
     { value: 'So\'richilik', label: 'So\'richilik' },
     { value: 'Akfa/MDF', label: 'Akfa/MDF' },
-    { value: 'Boshqa', label: 'Boshqa' }
+    { value: 'Naqqosh', label: 'Naqqosh'},
+    { value: 'Kuzatuvchi', label: 'Boshqa' }
   ];
 
   constructor(
