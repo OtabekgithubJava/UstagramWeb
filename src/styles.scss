@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+$primary-color: #e67e22;  
+$secondary-color: #27ae60;  
+$accent-color: #d35400;  
+$light-bg: #fdf2e9;  
+$text-color: #2c3e50;
+$light-text: #7f8c8d;
+$white: #ffffff;
+
 $primary-blue: #0095f6;
 $primary-blue-hover: #0080e0;
 $disabled-blue: #b2dffc;
@@ -147,3 +155,51 @@ button {
 }
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+
+body {
+  background-color: $light-bg;
+  color: $text-color;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.card {
+  background: $white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  }
+}
+
+.btn-primary {
+  background: $primary-color;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: darken($primary-color, 10%);
+    transform: translateY(-2px);
+  }
+  
+  &:disabled {
+    background: lighten($primary-color, 20%);
+    cursor: not-allowed;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadein {
+  animation: fadeIn 0.5s ease forwards;
+}

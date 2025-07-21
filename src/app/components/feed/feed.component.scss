@@ -672,8 +672,6 @@
 }
 
 
-
-/* In your feed.component.scss */
 .post-actions {
   display: flex;
   gap: 15px;
@@ -700,5 +698,267 @@
   
   .liked .fa-heart {
     color: #ed4956;
+  }
+}
+
+
+.stories-container {
+  width: 100%;
+  max-width: 614px;
+  margin: 0 auto 24px;
+  background-color: white;
+  border: 1px solid #dbdbdb;
+  border-radius: 8px;
+  padding: 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.stories-wrapper {
+  width: max-content;
+}
+
+.stories {
+  display: flex;
+  gap: 15px;
+}
+
+.story {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  width: 78px;
+  flex-shrink: 0;
+}
+
+.story-border {
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  padding: 2px;
+  background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.story-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid white;
+  overflow: hidden;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.story-username {
+  font-size: 12px;
+  margin-top: 5px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.story-viewer-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.story-viewer-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  height: 85vh;
+  max-height: 700px;
+  background-color: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.story-header {
+  padding: 10px;
+  position: relative;
+  z-index: 2;
+}
+
+.progress-bars {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.story-progress-container {
+  flex: 1;
+  height: 2px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.story-progress {
+  height: 100%;
+  width: 100%;
+  position: relative;
+  
+  &.completed {
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+  
+  &.active .story-progress-fill {
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.9);
+    animation: progress 5s linear forwards;
+  }
+}
+
+@keyframes progress {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+.story-user-info {
+  display: flex;
+  align-items: center;
+  color: white;
+  padding: 0 10px;
+}
+
+.viewer-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 10px;
+  border: 2px solid #3897f0;
+}
+
+.viewer-username {
+  font-weight: 600;
+  margin-right: 10px;
+}
+
+.story-time {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.close-story {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.story-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.story-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.story-footer {
+  padding: 15px;
+  display: flex;
+  align-items: center;
+}
+
+.story-reply {
+  flex: 1;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  padding: 8px 15px;
+  color: white;
+  outline: none;
+  
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+.send-reply {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.story-nav {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 30%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1;
+  
+  i {
+    color: white;
+    font-size: 24px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  
+  &:hover i {
+    opacity: 1;
+  }
+}
+
+.prev-story {
+  left: 0;
+}
+
+.next-story {
+  right: 0;
+}
+
+@media (max-width: 768px) {
+  .stories-container {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+  
+  .story-viewer-container {
+    max-width: 100%;
+    height: 100vh;
+    border-radius: 0;
   }
 }

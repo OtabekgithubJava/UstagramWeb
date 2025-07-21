@@ -41,12 +41,60 @@
     </div>
 
     <div class="feed-view" *ngIf="!showUserProfile">
-      <div class="stories-container">
-        <div class="stories">
-          <div *ngFor="let photo of storyPhotos; let i = index" class="story" (click)="openStoryModal(photo)">
-            <div class="story-avatar">
-              <img [src]="photo" loading="lazy" alt="Story">
+      <div class="stories-container" *ngIf="!showUserProfile">
+        <div class="stories-wrapper">
+          <div class="stories">
+            <div *ngFor="let story of stories; let i = index" class="story" (click)="openStoryViewer(i)">
+              <div class="story-border">
+                <div class="progress-bar" *ngIf="activeStoryIndex === i && storyViewerVisible">
+                  <div class="progress" [style.width.%]="progress"></div>
+                </div>
+                <div class="story-avatar">
+                  <img [src]="story.user.photoPath || 'photo.png'" loading="lazy" alt="Story">
+                </div>
+              </div>
+              <div class="story-username">{{ story.user.username }}</div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="story-viewer-backdrop" *ngIf="storyViewerVisible" (click)="closeStoryViewer()">
+        <div class="story-viewer-container" (click)="$event.stopPropagation()">
+          <div class="story-header">
+            <div class="progress-bars">
+              <div *ngFor="let story of stories; let i = index" class="story-progress-container">
+                <div class="story-progress" [class.active]="i === activeStoryIndex" [class.completed]="i < activeStoryIndex">
+                  <div class="story-progress-fill" *ngIf="i === activeStoryIndex" [style.width.%]="progress"></div>
+                </div>
+              </div>
+            </div>
+            <div class="story-user-info">
+              <img [src]="stories[activeStoryIndex].user.photoPath || 'photo.png'" class="viewer-avatar">
+              <span class="viewer-username">{{ stories[activeStoryIndex].user.username }}</span>
+              <span class="story-time">{{ stories[activeStoryIndex].time }}</span>
+            </div>
+            <button class="close-story" (click)="closeStoryViewer()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          
+          <div class="story-content">
+            <img [src]="stories[activeStoryIndex].image" class="story-image" (click)="nextStory()">
+          </div>
+          
+          <div class="story-footer">
+            <input type="text" class="story-reply" placeholder="Send message">
+            <button class="send-reply">
+              <i class="far fa-paper-plane"></i>
+            </button>
+          </div>
+          
+          <div class="story-nav prev-story" (click)="prevStory($event)">
+            <i class="fas fa-chevron-left"></i>
+          </div>
+          <div class="story-nav next-story" (click)="nextStory($event)">
+            <i class="fas fa-chevron-right"></i>
           </div>
         </div>
       </div>

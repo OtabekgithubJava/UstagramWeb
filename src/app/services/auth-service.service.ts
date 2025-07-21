@@ -30,6 +30,14 @@ export class AuthServiceService {
     // for (let pair of (formData as any).entries()) {
     //     console.log(pair[0] + ', ' + pair[1]);
     // }
+
+    const username = formData.get('username');
+    const phone = formData.get('phone');
+    
+    if (!username || !phone) {
+      return throwError(() => new Error('Username va telefon raqam talab qilinadi'));
+    }
+
     return this.http.post(`${this.apiUrl}/signup`, formData, {
       headers: new HttpHeaders({
             'enctype': 'multipart/form-data'
@@ -40,7 +48,12 @@ export class AuthServiceService {
           localStorage.setItem('token', response.token);
         }
       }),
-      catchError(this.handleError)
+      catchError(error => {
+      if (error.status === 409) {  
+        return throwError(() => new Error('Bunday foydalanuvchi allaqachon mavjud!'));
+      }
+      return throwError(() => error);
+    })
     );
   }
 

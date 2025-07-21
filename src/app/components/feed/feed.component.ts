@@ -26,6 +26,12 @@ export class FeedComponent implements OnInit, OnDestroy {
   storyPhotos: string[] = [];
   selectedStory: string | null = null;
   storyModalVisible = false;
+  stories: any[] = [];
+  storyViewerVisible = false;
+  activeStoryIndex = 0;
+  progress = 0;
+  storyInterval: any;
+  storyPaused = false;
 
   private destroy$ = new Subject<void>();
   private currentPage = 1;
@@ -33,6 +39,7 @@ export class FeedComponent implements OnInit, OnDestroy {
   private isFetching = false;
   private hasMorePosts = true;
   private userFavorites: string[] = [];
+  private scrollListener: () => void;
   
   private photoList: string[] = [
     'p1.jpeg', 'p2.jpeg', 'p3.jpeg', 'p4.jpeg', 'p5.jpeg',
@@ -47,13 +54,112 @@ export class FeedComponent implements OnInit, OnDestroy {
     private favouriteService: FavoritesService,
     private router: Router,
     private route: ActivatedRoute
-  ) {}
+  ) {
+    this.scrollListener = () => {
+      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+        this.loadPosts();
+      }
+    };
+  }
 
   ngOnInit(): void {
     this.checkViewport();
     this.loadInitialData();
     this.setupScrollListener();
     this.generateStoryPhotos();
+    this.generateStories();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.clearStoryProgress();
+    window.removeEventListener('scroll', this.scrollListener);
+  }
+
+  generateStories(): void {
+    this.stories = Array(10).fill(null).map((_, i) => ({
+      user: {
+        username: `user${i+1}`,
+        photoPath: this.getRandomPhoto(),
+        fullName: `User ${i+1}`
+      },
+      image: this.getRandomPhoto(),
+      time: this.getRandomTime(),
+      viewed: false
+    }));
+  }
+
+  getRandomTime(): string {
+    const hours = Math.floor(Math.random() * 12) + 1;
+    const minutes = Math.floor(Math.random() * 60);
+    const ampm = Math.random() > 0.5 ? 'AM' : 'PM';
+    return `${hours}:${minutes < 10 ? '0' + minutes : minutes} ${ampm}`;
+  }
+
+  openStoryViewer(index: number): void {
+    this.activeStoryIndex = index;
+    this.storyViewerVisible = true;
+    this.stories[index].viewed = true;
+    this.startStoryProgress();
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeStoryViewer(): void {
+    this.storyViewerVisible = false;
+    this.clearStoryProgress();
+    document.body.style.overflow = '';
+  }
+
+  startStoryProgress(): void {
+    this.progress = 0;
+    this.storyPaused = false;
+    
+    this.storyInterval = setInterval(() => {
+      if (!this.storyPaused) {
+        this.progress += 1;
+        
+        if (this.progress >= 100) {
+          this.nextStory();
+        }
+      }
+    }, 100);
+  }
+
+  clearStoryProgress(): void {
+    if (this.storyInterval) {
+      clearInterval(this.storyInterval);
+      this.storyInterval = null;
+    }
+  }
+
+  nextStory(event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+    
+    if (this.activeStoryIndex < this.stories.length - 1) {
+      this.activeStoryIndex++;
+      this.progress = 0;
+      this.stories[this.activeStoryIndex].viewed = true;
+    } else {
+      this.closeStoryViewer();
+    }
+  }
+
+  prevStory(event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+    
+    if (this.activeStoryIndex > 0) {
+      this.activeStoryIndex--;
+      this.progress = 0;
+    }
+  }
+
+  pauseStory(): void {
+    this.storyPaused = true;
+  }
+
+  resumeStory(): void {
+    this.storyPaused = false;
   }
 
   private getRandomPhoto(): string {
@@ -124,6 +230,8 @@ export class FeedComponent implements OnInit, OnDestroy {
       }
     } catch (err) {
       console.error('Error loading initial data:', err);
+      this.errorMessage = 'Failed to load data';
+      this.isLoading = false;
     }
   }
 
@@ -154,11 +262,20 @@ export class FeedComponent implements OnInit, OnDestroy {
       const user = await lastValueFrom(
         this.userService.getUserByUsername(username).pipe(takeUntil(this.destroy$))
       );
+      
+      if (!user) {
+        this.errorMessage = 'User not found';
+        this.router.navigate(['/feed']);
+        return;
+      }
+      
       this.viewedUser = user;
       await this.loadUserPosts(user.id);
     } catch (err) {
       console.error('Error loading user profile:', err);
       this.errorMessage = 'Could not load user profile';
+      this.router.navigate(['/feed']);
+    } finally {
       this.isLoading = false;
     }
   }
@@ -253,11 +370,7 @@ export class FeedComponent implements OnInit, OnDestroy {
 
   setupScrollListener(): void {
     if (!this.showUserProfile) {
-      window.addEventListener('scroll', () => {
-        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
-          this.loadPosts();
-        }
-      });
+      window.addEventListener('scroll', this.scrollListener);
     }
   }
 
@@ -286,11 +399,5 @@ export class FeedComponent implements OnInit, OnDestroy {
     this.showUserProfile = false;
     this.viewedUser = null;
     this.router.navigate(['/feed']);
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-    window.removeEventListener('scroll', () => {});
   }
 }
