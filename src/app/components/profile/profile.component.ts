@@ -124,7 +124,7 @@ export class ProfileComponent implements OnInit {
     if (navigator.share) {
       navigator.share({
         title: `${this.user?.fullName}'s Profile`,
-        text: `Check out ${this.user?.fullName}'s profile`,
+        text: `Check out ${this.user?.fullName}'s profile at ustagram.vercel.app/${this.user?.username}`,
         url: window.location.href
       }).catch(err => console.error('Error sharing:', err));
     } else {
