@@ -158,11 +158,12 @@
         </label>
         <div class="role-selection">
           <div class="role-option" 
-               [class.selected]="userData.status === 'FARMER'"
-               (click)="userData.status = 'FARMER'">
+               [class.selected]="userData.status === 'KUZATUVCHI'"
+               (click)="userData.status = 'KUZATUVCHI'"
+               (click)="userData.masterType = kuzatuvchi">
             <i class="icon-tractor"></i>
-            <h3>Fermer</h3>
-            <p>O'zim fermerlik bilan shug'ullanaman</p>
+            <h3>KUZATUVCHI</h3>
+            <p>Mutaxassislarni kuzataman</p>
           </div>
           <div class="role-option" 
                [class.selected]="userData.status === 'EXPERT'"

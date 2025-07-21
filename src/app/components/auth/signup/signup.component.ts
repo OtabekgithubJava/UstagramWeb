@@ -133,7 +133,7 @@ export class SignupComponent implements OnInit {
 
   validateStep3(): boolean {
     if (!this.userData.status) {
-      this.errorMessage = 'Iltimos, rolni tanlang (Fermer yoki Duradgor)';
+      this.errorMessage = 'Iltimos, rolni tanlang (Kuzatuvchi yoki Duradgor)';
       return false;
     }
     
