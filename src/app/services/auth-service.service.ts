@@ -31,12 +31,12 @@ export class AuthServiceService {
     //     console.log(pair[0] + ', ' + pair[1]);
     // }
 
-    const username = formData.get('username');
-    const phone = formData.get('phone');
+    // const username = formData.get('username');
+    // const phone = formData.get('phone');
     
-    if (!username || !phone) {
-      return throwError(() => new Error('Username va telefon raqam talab qilinadi'));
-    }
+    // if (!username || !phone) {
+    //   return throwError(() => new Error('Username va telefon raqam talab qilinadi'));
+    // }
 
     return this.http.post(`${this.apiUrl}/signup`, formData, {
       headers: new HttpHeaders({
