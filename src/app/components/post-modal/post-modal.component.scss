@@ -79,7 +79,7 @@
   flex-direction: column;
   height: 100%;
   gap: 20px;
-  position: relative; 
+  position: relative;
 
   .post-header {
     flex-shrink: 0;
@@ -114,6 +114,7 @@
   .post-comments {
     flex: 1;
     overflow-y: auto;
+    max-height: calc(80vh - 150px); /* Adjusted for header, caption, actions, and add-comment */
     margin-bottom: 10px;
     padding-right: 10px;
 
@@ -165,7 +166,7 @@
     background: white;
     display: flex;
     gap: 10px;
-    position: sticky; 
+    position: sticky;
     bottom: 0;
     z-index: 10;
 
@@ -362,7 +363,11 @@
     display: flex !important;
   }
 
+  .post-comments {
+    max-height: calc(80vh - 150px) !important; 
+  }
+
   .add-comment {
-    padding: 10px 20px; 
+    padding: 10px 20px;
   }
 }
