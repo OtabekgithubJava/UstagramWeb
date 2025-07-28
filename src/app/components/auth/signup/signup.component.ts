@@ -197,11 +197,13 @@ export class SignupComponent implements OnInit {
       return;
     }
 
-    if (this.userData.telegramUrl || !this.userData.telegramUrl) {
+    // if (this.userData.telegramUrl || !this.userData.telegramUrl) {
+    if (this.userData.telegramUrl) {
       this.userData.telegramUrl = `https://t.me/${this.userData.telegramUrl}`;
     }
 
-    if (this.userData.instagramUrl || !this.userData.instagramUrl) {
+    // if (this.userData.instagramUrl || !this.userData.instagramUrl) {
+    if (this.userData.instagramUrl) {
       this.userData.instagramUrl = `https://www.instagram.com/${this.userData.instagramUrl}`;
     }
 

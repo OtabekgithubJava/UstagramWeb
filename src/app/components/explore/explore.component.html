@@ -57,6 +57,7 @@
     <h3>Eng yaxshi mutaxassislar</h3>
     <div class="users-table">
       <div class="table-header">
+        <div class="header-item">O'rin</div> <!-- New ranking column -->
         <div class="header-item">Foydalanuvchi</div>
         <div class="header-item">Mutaxassislik</div>
         <div class="header-item">Tajriba</div>
@@ -64,9 +65,11 @@
       </div>
       
       <div class="table-body">
-        <div *ngFor="let user of filteredTopUsers" class="table-row" (click)="navigateToProfile(user.username)">
+        <div *ngFor="let user of filteredTopUsers; let i = index" class="table-row" (click)="navigateToProfile(user.username)">
+          <div class="table-cell rank-cell">
+            <span class="rank-badge">{{ i + 1 }}</span>
+          </div>
           <div class="table-cell user-cell">
-            <!-- <img [src]="user.photoUrl" class="user-avatar"> -->
             <img src="photo.png" class="user-avatar">
             <div class="user-info">
               <span class="username">{{ user.username }}</span>

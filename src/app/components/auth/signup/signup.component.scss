@@ -302,6 +302,7 @@ $white: #ffffff;
       position: relative;
       display: flex;
       align-items: center;
+      margin-bottom: 10px;
 
       i {
         font-size: 1.2rem;
@@ -309,17 +310,31 @@ $white: #ffffff;
         color: #555;
         width: 30px;
         text-align: center;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        left: 0;
       }
-      
+
       .social-prefix {
         position: absolute;
-        left: 30px;
+        left: 40px; 
+        top: 50%;
+        transform: translateY(-50%);
         color: #777;
+        font-size: 1rem;
         pointer-events: none;
+        background: #f9f9f9;
+        padding: 0 5px;
       }
-      
+
       input {
-        padding-left: 120px !important;
+        width: 100%;
+        padding: 12px 15px 12px 110px !important; 
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        background-color: #f9f9f9;
       }
     }
 
