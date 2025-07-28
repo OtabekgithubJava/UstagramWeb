@@ -299,9 +299,9 @@ $white: #ffffff;
     }
 
     .social-input {
+      position: relative;
       display: flex;
       align-items: center;
-      margin-bottom: 10px;
 
       i {
         font-size: 1.2rem;
@@ -310,9 +310,16 @@ $white: #ffffff;
         width: 30px;
         text-align: center;
       }
-
+      
+      .social-prefix {
+        position: absolute;
+        left: 30px;
+        color: #777;
+        pointer-events: none;
+      }
+      
       input {
-        flex: 1;
+        padding-left: 120px !important;
       }
     }
 

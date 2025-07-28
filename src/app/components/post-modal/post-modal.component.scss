@@ -290,3 +290,49 @@
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
 }
+
+
+.modal-backdrop {
+  position: fixed;
+  overflow: hidden;
+  
+  .modal-content {
+    max-height: 100vh;
+    
+    .post-image-section {
+      max-height: 50vh;
+      overflow: hidden;
+      
+      .post-image {
+        width: 100%;
+        height: auto;
+        max-height: 50vh;
+        object-fit: contain;
+      }
+    }
+    
+    .post-details-section {
+      .post-header {
+        .user-pic {
+          width: 40px;
+          height: 40px;
+          
+          @media (max-width: 480px) {
+            width: 32px;
+            height: 32px;
+          }
+        }
+      }
+      
+      .comment-user-pic {
+        width: 32px;
+        height: 32px;
+        
+        @media (max-width: 480px) {
+          width: 28px;
+          height: 28px;
+        }
+      }
+    }
+  }
+}

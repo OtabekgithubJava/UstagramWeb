@@ -56,6 +56,7 @@ export class PostModalComponent {
   ) {}
 
   ngOnInit() {
+    document.body.style.overflow = 'hidden';
     if (this.post) {
       this.randomPhoto = this.getRandomPhoto();
     }

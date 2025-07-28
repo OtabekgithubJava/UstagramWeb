@@ -197,6 +197,14 @@ export class SignupComponent implements OnInit {
       return;
     }
 
+    if (this.userData.telegramUrl || !this.userData.telegramUrl) {
+      this.userData.telegramUrl = `https://t.me/${this.userData.telegramUrl}`;
+    }
+
+    if (this.userData.instagramUrl || !this.userData.instagramUrl) {
+      this.userData.instagramUrl = `https://www.instagram.com/${this.userData.instagramUrl}`;
+    }
+
     if (!this.validateStep3()) {
       return;
     }
@@ -265,6 +273,6 @@ export class SignupComponent implements OnInit {
     if (err.status === 400 && err.message.includes('Validation failed')) {
       return 'Maʼlumotlar notoʻgʻri kiritildi. Iltimos, barcha maydonlarni toʻgʻri toʻldirganingizni tekshiring.';
     }
-    return 'Roʻyxatdan oʻtish amalga oshmadi. Iltimos, qayta urinib koʻring yoki texnik yordamga murojaat qiling.';
+    return 'Roʻyxatdan oʻtish amalga oshmadi. Iltimos, qayta urinib koʻring yoki texnik yordamga murojaat qiling [+998910562712].';
   }
 }

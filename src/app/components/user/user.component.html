@@ -5,7 +5,9 @@
     </button>
     <h2 class="username">
       {{ user.username }}
-      <span class="verified-badge" *ngIf="posts.length > 5" title="Bu belgiga ega bo'lish uchun, ko'proq post yarating."></span>
+      <span class="verified-badge" *ngIf="posts.length > 5" title="Faol profil">
+        <i class="fas fa-check-circle"></i>
+      </span>
     </h2>
     <div class="header-actions" *ngIf="isCurrentUser">
       <button class="edit-button" (click)="navigateToEdit()">

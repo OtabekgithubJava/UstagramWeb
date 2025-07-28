@@ -229,17 +229,19 @@
         </label>
         <div class="social-input">
           <i class="icon-telegram"></i>
-          <input type="url" 
-                 name="telegramUrl" 
-                 [(ngModel)]="userData.telegramUrl" 
-                 placeholder="Telegram profil havolasi">
+          <span class="social-prefix">t.me/</span>
+          <input type="text" 
+                name="telegramUsername" 
+                [(ngModel)]="userData.telegramUrl" 
+                placeholder="foydalanuvchi_nomi">
         </div>
         <div class="social-input">
           <i class="icon-instagram"></i>
-          <input type="url" 
-                 name="instagramUrl" 
-                 [(ngModel)]="userData.instagramUrl" 
-                 placeholder="Instagram profil havolasi">
+          <span class="social-prefix">instagram.com/</span>
+          <input type="text" 
+                name="instagramUsername" 
+                [(ngModel)]="userData.instagramUrl" 
+                placeholder="foydalanuvchi_nomi">
         </div>
       </div>
 
