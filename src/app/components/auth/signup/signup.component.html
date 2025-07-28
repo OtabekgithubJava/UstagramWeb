@@ -17,8 +17,31 @@
       </div>
     </div>
 
-    <div *ngIf="errorMessage" class="error-message">
-      {{ errorMessage }}
+    <!-- Error Modal -->
+    <div *ngIf="showErrorModal" class="error-modal-overlay" (click)="closeErrorModal()">
+      <div class="error-modal" (click)="$event.stopPropagation()">
+        <div class="error-modal-header">
+          <h3>Xatolik</h3>
+          <button (click)="closeErrorModal()" class="close-btn">&times;</button>
+        </div>
+        <div class="error-modal-body">
+          <i class="icon-warning"></i>
+          <p>{{ errorMessage }}</p>
+        </div>
+        <div class="error-modal-footer">
+          <button (click)="closeErrorModal()" class="primary-btn">Tushunarli</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading Modal -->
+    <div *ngIf="isProcessing" class="processing-modal-overlay">
+      <div class="processing-modal">
+        <div class="spinner"></div>
+        <h3>Ro'yxatdan o'tish jarayoni</h3>
+        <p>Iltimos kuting, bu biroz vaqt olishi mumkin...</p>
+        <p class="hint">Internet aloqasi sekin bo'lsa, jarayon uzoroq vaqt olishi mumkin</p>
+      </div>
     </div>
 
     <!-- Step 1: Basic Information -->
@@ -87,8 +110,9 @@
         <small>Profilni tasdiqlash uchun ishlatiladi</small>
       </div>
 
-      <button type="submit" [disabled]="step1Form.invalid" class="primary-btn">
-        Keyingi qadam <i class="icon-arrow-right"></i>
+      <button type="submit" [disabled]="step1Form.invalid || isProcessing" class="primary-btn">
+        <span *ngIf="!isProcessing">Keyingi qadam <i class="icon-arrow-right"></i></span>
+        <span *ngIf="isProcessing"><i class="icon-spinner spinner-icon"></i> Yuklanmoqda...</span>
       </button>
     </form>
 
@@ -142,11 +166,12 @@
       </div>
 
       <div class="button-group">
-        <button type="button" class="secondary-btn" (click)="prevStep()">
+        <button type="button" class="secondary-btn" (click)="prevStep()" [disabled]="isProcessing">
           <i class="icon-arrow-left"></i> Orqaga
         </button>
-        <button type="submit" [disabled]="step2Form.invalid" class="primary-btn" aria-label="Confirm">
-          Keyingi qadam <i class="icon-arrow-right"></i>
+        <button type="submit" [disabled]="step2Form.invalid || isProcessing" class="primary-btn">
+          <span *ngIf="!isProcessing">Keyingi qadam <i class="icon-arrow-right"></i></span>
+          <span *ngIf="isProcessing"><i class="icon-spinner spinner-icon"></i> Yuklanmoqda...</span>
         </button>
       </div>
     </form>
@@ -160,20 +185,11 @@
           <i class="icon-badge"></i> Siz kim sifatida ro'yxatdan o'tmoqchisiz?
         </label>
         <div class="role-selection">
-          <!-- <div class="role-option" 
-               [class.selected]="userData.status === 'KUZATUVCHI'"
-               (click)="userData.status = 'KUZATUVCHI'"
-               (click)="userData.masterType = kuzatuvchi">
-            <i class="icon-tractor"></i>
-            <h3>KUZATUVCHI</h3>
-            <p>Mutaxassislarni kuzataman</p>
-          </div> -->
           <div class="role-option" 
                [class.selected]="userData.status === 'EXPERT'"
                (click)="userData.status = 'EXPERT'">
             <i class="icon-graduation-cap"></i>
             <h3>Mutaxassis</h3>
-            <p>Agro sohada mutaxassislik qilaman</p>
           </div>
         </div>
       </div>
@@ -191,7 +207,7 @@
           <option value="Eshik-deraza">Eshik-deraza</option>
           <option value="AKFA">Akfa & MDF</option>
           <option value="Naqqosh">Naqqoshlik</option>
-          <option value="Kuzatuvchu">Boshqa</option>
+          <option value="Kuzatuvchi">Boshqa</option>
         </select>
       </div>
 
@@ -234,21 +250,19 @@
                [(ngModel)]="termsAccepted" 
                required>
         <label for="terms">
-          <!-- Ustagram <a href="/terms">foydalanish shartlari</a> va  -->
-          <!-- <a href="/privacy">maxfiylik siyosati</a> bilan tanishdim va roziman -->
-           Ustagram <a>davom etish</a> va 
-          <a>ro`yhatdan o`tish orqali</a> ma`lumotingiz qayta ishlanishiga rozi bo`lasiz
+          Ustagram davom etish va ro`yhatdan o`tish orqali ma`lumotingiz qayta ishlanishiga rozi bo`lasiz
         </label>
       </div>
 
       <div class="button-group">
-        <button type="button" class="secondary-btn" (click)="prevStep()">
+        <button type="button" class="secondary-btn" (click)="prevStep()" [disabled]="isProcessing">
           <i class="icon-arrow-left"></i> Orqaga
         </button>
         <button type="submit" 
-                [disabled]="step3Form.invalid || !termsAccepted" 
+                [disabled]="step3Form.invalid || !termsAccepted || isProcessing" 
                 class="primary-btn">
-          <i class="icon-check"></i> Ro'yxatdan o'tish
+          <span *ngIf="!isProcessing"><i class="icon-check"></i> Ro'yxatdan o'tish</span>
+          <span *ngIf="isProcessing"><i class="icon-spinner spinner-icon"></i> Jo'natilmoqda...</span>
         </button>
       </div>
     </form>

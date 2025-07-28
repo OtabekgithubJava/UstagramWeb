@@ -9,7 +9,6 @@
 
       <div class="post-details-section" *ngIf="!isMobile">
         <div class="post-header">
-          <!-- <img [src]="post.user.photoPath || 'photo.png'" class="user-pic"> -->
           <img src="photo.png" class="user-pic">
           <span class="username">{{ post.user.username || 'unknown' }}</span>
         </div>
@@ -21,7 +20,6 @@
 
         <div class="post-comments">
           <div class="comment" *ngFor="let comment of post.comments || []">
-            <!-- <img [src]="comment.user?.photoPath || 'photo.png'" class="comment-user-pic"> -->
             <img src="photo.png" class="comment-user-pic">
             <div class="comment-content">
               <strong>{{ comment.user?.username || 'unknown' }}</strong> {{ comment.content }}
@@ -30,9 +28,6 @@
         </div>
 
         <div class="post-actions">
-          <!-- <button (click)="likePost()">
-            <i class="far fa-heart"></i> {{ post.likes || 0 }}
-          </button> -->
           <button (click)="focusCommentInput()">
             <i class="far fa-comment"></i>
           </button>
@@ -61,16 +56,15 @@
         </div>
         <div class="post-comments">
           <div class="comment" *ngFor="let comment of post.comments || []">
-            <img [src]="comment.user?.photoPath || 'photo.png'"  class="comment-user-pic">
-            <img src="photo.png"  class="comment-user-pic">
+            <img src="photo.png" class="comment-user-pic">
             <div class="comment-content">
               <strong>{{ comment.user?.username || 'unknown' }}</strong> {{ comment.content }}
             </div>
           </div>
         </div>
         <div class="add-comment">
-          <input #commentInput placeholder="Add a comment..." (keyup.enter)="addComment(commentInput.value)">
-          <button (click)="addComment(commentInput.value)">Post</button>
+          <input #mobileCommentInput placeholder="Add a comment..." (keyup.enter)="addComment(mobileCommentInput.value)">
+          <button (click)="addComment(mobileCommentInput.value)">Post</button>
         </div>
       </div>
     </div>

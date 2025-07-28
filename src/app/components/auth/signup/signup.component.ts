@@ -14,7 +14,8 @@ export class SignupComponent implements OnInit {
   passwordStrength = 0;
   selectedFile: File | null = null;
   errorMessage: string | null = null;
-  isLoading = false;
+  isProcessing = false;
+  showErrorModal = false;
   
   regions = [
     'Andijon', 'Buxoro', 'Farg`ona', 'Jizzax', 
@@ -71,11 +72,11 @@ export class SignupComponent implements OnInit {
     const file = event.target.files[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        this.errorMessage = 'Rasm hajmi 5MB dan kichik boʻlishi kerak.';
+        this.showError('Rasm hajmi 5MB dan kichik boʻlishi kerak.');
         return;
       }
       if (!['image/jpeg', 'image/png'].includes(file.type)) {
-        this.errorMessage = 'Faqat JPEG yoki PNG rasmlar yuklanadi.';
+        this.showError('Faqat JPEG yoki PNG rasmlar yuklanadi.');
         return;
       }
       this.selectedFile = file;
@@ -91,25 +92,70 @@ export class SignupComponent implements OnInit {
     this.userData.fullName = this.sanitizeInput(this.userData.fullName);
     this.userData.username = this.sanitizeInput(this.userData.username);
 
+    if (!this.userData.fullName) {
+      this.showError('Iltimos, toʻliq ismingizni kiriting');
+      return false;
+    }
+
+    if (!this.userData.username) {
+      this.showError('Iltimos, foydalanuvchi nomini kiriting');
+      return false;
+    }
+
+    if (!this.userData.password) {
+      this.showError('Iltimos, parol yarating');
+      return false;
+    }
+
+    if (!this.userData.phone) {
+      this.showError('Iltimos, telefon raqamingizni kiriting');
+      return false;
+    }
+
     this.checkPasswordStrength();
     if (this.passwordStrength < 2) {
-      this.errorMessage = 'Parol kamida 8 belgi, katta harf, kichik harf va raqamdan iborat boʻlishi kerak.';
+      this.showError(`
+        Parolingiz yetarli darajada mustahkam emas. Quyidagilarni tekshiring:
+        - Kamida 8 ta belgi
+        - Kamida 1 ta katta harf
+        - Kamida 1 ta kichik harf
+        - Kamida 1 ta raqam
+      `);
       return false;
     }
 
     const phoneRegex = /^\+998[0-9]{9}$/;
     if (!phoneRegex.test(this.userData.phone)) {
-      this.errorMessage = 'Telefon raqam +998XXYYYYYYY formatida boʻlishi kerak.';
+      this.showError(`
+        Telefon raqam notoʻgʻri formatda. Toʻgʻri format:
+        +998XXYYYYYYY (masalan: +998901234567)
+      `);
       return false;
     }
 
     const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
     if (!usernameRegex.test(this.userData.username)) {
-      this.errorMessage = 'Foydalanuvchi nomi 3-20 belgi, faqat harf, raqam va pastki chiziqdan iborat boʻlishi kerak.';
+      this.showError(`
+        Foydalanuvchi nomi notoʻgʻri. Quyidagi shartlarni tekshiring:
+        - 3-20 belgi uzunlikda
+        - Faqat harflar (a-z, A-Z)
+        - Raqamlar (0-9)
+        - Pastki chiziq (_) ishlatilishi mumkin
+      `);
       return false;
     }
 
     return true;
+  }
+
+  showError(message: string) {
+    this.errorMessage = message;
+    this.showErrorModal = true;
+  }
+
+  closeErrorModal() {
+    this.showErrorModal = false;
+    this.errorMessage = null;
   }
 
   checkPasswordStrength() {
@@ -133,12 +179,12 @@ export class SignupComponent implements OnInit {
 
   validateStep3(): boolean {
     if (!this.userData.status) {
-      this.errorMessage = 'Iltimos, rolni tanlang (Kuzatuvchi yoki Duradgor)';
+      this.showError('Iltimos, rolni tanlang (Mutaxassis)');
       return false;
     }
     
     if (this.userData.status === 'EXPERT' && !this.userData.masterType) {
-      this.errorMessage = 'Iltimos, mutaxassislik turini tanlang';
+      this.showError('Iltimos, mutaxassislik turini tanlang');
       return false;
     }
 
@@ -147,11 +193,15 @@ export class SignupComponent implements OnInit {
 
   onSubmit(): void {
     if (!this.termsAccepted) {
-      this.errorMessage = 'Please accept the terms and conditions';
+      this.showError('Iltimos, foydalanish shartlari bilan tanishib chiqing va rozilik bering');
       return;
     }
 
-    this.isLoading = true;
+    if (!this.validateStep3()) {
+      return;
+    }
+
+    this.isProcessing = true;
     this.errorMessage = null;
 
     const formData = new FormData();
@@ -162,7 +212,6 @@ export class SignupComponent implements OnInit {
     formData.append('Location', this.userData.location);
     formData.append('Dob', new Date(this.userData.dob).toISOString().split('T')[0]);
     formData.append('Status', this.userData.status);
-
     formData.append('PhotoPath', this.userData.photoPath || 'assets/default-profile.png');
     
     if (this.userData.masterType) {
@@ -191,36 +240,31 @@ export class SignupComponent implements OnInit {
 
     this.authService.signup(formData).subscribe({
       next: (response) => {
-        this.isLoading = false;
+        this.isProcessing = false;
         if (response.token) {
           localStorage.setItem('token', response.token);
         }
         this.router.navigate(['/feed']);
       },
       error: (err) => {
-        this.isLoading = false;
-        this.errorMessage = this.formatErrorMessage(err);
+        this.isProcessing = false;
+        this.showError(this.formatErrorMessage(err));
       }
     });
   }
 
   formatErrorMessage(err: any): string {
     if (err.status === 409) {
-      return 'Bu foydalanuvchi nomi yoki telefon raqami allaqachon roʻyxatdan oʻtgan.';
+      return `
+        Ushbu maʼlumotlar allaqachon roʻyxatdan oʻtgan:
+        - ${err.error?.username ? 'Foydalanuvchi nomi' : ''}
+        - ${err.error?.phone ? 'Telefon raqami' : ''}
+        Iltimos, boshqa maʼlumotlardan foydalaning yoki hisobingizga kiring.
+      `;
     }
     if (err.status === 400 && err.message.includes('Validation failed')) {
-      return err.message || 'Maʼlumotlar notoʻgʻri kiritildi. Iltimos, tekshirib qayta urinib koʻring.';
+      return 'Maʼlumotlar notoʻgʻri kiritildi. Iltimos, barcha maydonlarni toʻgʻri toʻldirganingizni tekshiring.';
     }
-    return err.message || 'Roʻyxatdan oʻtish amalga oshmadi. Iltimos, qayta urinib koʻring.';
-  }
-
-  formatDate(dateString: string): string {
-    if (!dateString) return '';
-    try {
-      const date = new Date(dateString);
-      return date.toISOString().split('T')[0];
-    } catch {
-      return '';
-    }
+    return 'Roʻyxatdan oʻtish amalga oshmadi. Iltimos, qayta urinib koʻring yoki texnik yordamga murojaat qiling.';
   }
 }

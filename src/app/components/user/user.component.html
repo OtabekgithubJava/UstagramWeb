@@ -3,7 +3,10 @@
     <button class="back-button" routerLink="/feed">
       <i class="fas fa-arrow-left"></i>
     </button>
-    <h2 class="username">{{ user.username }}</h2>
+    <h2 class="username">
+      {{ user.username }}
+      <span class="verified-badge" *ngIf="posts.length > 5" title="Bu belgiga ega bo'lish uchun, ko'proq post yarating."></span>
+    </h2>
     <div class="header-actions" *ngIf="isCurrentUser">
       <button class="edit-button" (click)="navigateToEdit()">
         <i class="fas fa-pencil-alt"></i>
